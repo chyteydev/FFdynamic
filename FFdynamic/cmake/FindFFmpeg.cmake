@@ -54,8 +54,20 @@ endmacro ()
 macro (pkgconfig_get_search_lib_and_path_hints lib)
   string(TOUPPER ${lib} upperlib)
   pkg_check_modules(PC_${upperlib} REQUIRED lib${lib})
-  set(${lib}_hint ${PC_${upperlib}_LIBRARY_DIRS})
-  set(${lib}_include_hint ${PC_${upperlib}_INCLUDE_DIRS})
+  find_path(${upperlib}_INCLUDE_DIRS lib${lib}/version.h
+    HINTS
+      ${PC_${upperlib}_INCLUDEDIR}
+      ${PC_${upperlib}_INCLUDE_DIRS}
+    PATH_SUFFIXES
+      ffmpeg
+  )
+  find_path(${upperlib}_LIBRARY_DIRS lib${lib}.so
+    HINTS
+      ${PC_${upperlib}_LIBDIR}
+      ${PC_${upperlib}_LIBRARY_DIRS}
+  )
+  set(${lib}_hint ${${upperlib}_LIBRARY_DIRS})
+  set(${lib}_include_hint ${${upperlib}_INCLUDE_DIRS})
   list(APPEND pkgconfig_lib_hints ${${lib}_hint})
   list(APPEND pkgconfig_include_hints ${${lib}_include_hint})
 endmacro ()
